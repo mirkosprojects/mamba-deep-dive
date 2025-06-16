@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from celluloid import Camera
 
 def discretize(A: np.ndarray, B: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray]:
     """
@@ -50,3 +52,62 @@ def whitesignal(period, dt, freq, rms=0.5):
     signal = np.fft.irfft(coefficients, axis=-1)
     signal = signal - signal[..., :1]  # Start from 0
     return signal
+
+def animate_spring_system(
+    u: np.ndarray,
+    y: np.ndarray,
+    mass_width=0.0016,
+    mass_height=0.1,
+    spring_height=0.05,
+    num_coils=15,
+    wall_x=0,
+    time_s=5,
+):
+    """
+    Animates a spring-mass system with a wall, given the force u and position y.\\
+    Adapted from: https://srush.github.io/annotated-s4/
+    """
+
+    L = len(u)
+    ks = np.arange(L)
+
+    # Plot Settings
+    fig, (ax1, ax2, ax3) = plt.subplots(3, figsize=(12, 8))
+    camera = Camera(fig)
+    ax1.set_title("Force $u_k$")
+    ax2.set_title("Position $y_k$")
+    ax3.set_title("Object")
+    ax1.set_xticks([], [])
+    ax2.set_xticks([], [])
+    ax3.set_xticks([], [])
+    ax3.set_xlim(-0.4 * max(y), 1.4 * max(y))
+    ax3.set_ylim(-0.2, 0.2)
+    fig.tight_layout()
+
+    # Animate plot over time
+    for k in range(0, L):
+        # Plot applied force
+        ax1.plot(ks[:k], u[:k], color="red")
+
+        # Plot object position
+        ax2.plot(ks[:k], y[:k], color="blue")
+
+        # Plot wall
+        ax3.plot([wall_x, wall_x], [-0.2, 0.2], color='black', linewidth=2)
+
+        # Plot spring
+        spring_x = np.linspace(wall_x, y[k], num=500)
+        spring_y = (spring_height / 2) * np.sin(2 * np.pi * num_coils * np.linspace(0, 1, len(spring_x)))
+        ax3.plot(spring_x, spring_y, color="gray", linewidth=2)
+
+        # Plot Mass
+        mass = plt.Rectangle((y[k], -mass_height / 2),
+                            mass_width, mass_height,
+                            fc="steelblue", ec="black")
+        ax3.add_patch(mass)
+
+        camera.snap()
+
+    interval = int(time_s * 1000 / L)
+    plt.close()
+    return camera.animate(interval=interval)
