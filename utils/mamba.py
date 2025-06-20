@@ -4,10 +4,9 @@ import torch.nn.functional as F
 import json
 from einops import rearrange, repeat, einsum
 
-def generate(model, tokenizer, prompt: str, n_tokens_to_gen=50, sample=True, top_k=40):
+def generate(model, input_ids, n_tokens_to_gen=50, sample=True, top_k=40):
     model.eval()
-    input_ids = tokenizer(prompt, return_tensors='pt').input_ids
-    yield tokenizer.decode(input_ids[0])  # Yield the initial prompt
+    yield input_ids[0]  # Yield the initial prompt
 
     for _ in range(n_tokens_to_gen):
         with torch.no_grad():
@@ -26,7 +25,7 @@ def generate(model, tokenizer, prompt: str, n_tokens_to_gen=50, sample=True, top
 
         input_ids = torch.cat([input_ids, next_token], dim=1)
 
-        yield tokenizer.decode(next_token[0])
+        yield next_token[0]
 
 
 def from_pretrained(pretrained_model_name: str):
