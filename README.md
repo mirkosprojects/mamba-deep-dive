@@ -1,6 +1,6 @@
 # A Deep Dive into MAMBA and State Space Models for Long-Sequence Modeling
 
-This repository accompanies the [research article](https://hackmd.io/589poacBT3-iyPUqBTOQUQ) we wrote about State Space Models and MAMBA.
+This repository accompanies the [research article](https://hackmd.io/@mirkosch123/HkVjhc4Mee) we wrote about State Space Models and MAMBA.
 
 ## Authors
 
